@@ -8,7 +8,6 @@ def now_iso():
 stop_event = threading.Event()
 
 def handle_failure(conn, job_id, attempts, max_retries, base=2):
-    """Handle retries with exponential backoff and DLQ movement."""
     attempts += 1
     if attempts > max_retries:
         conn.execute("UPDATE jobs SET state='dead', updated_at=? WHERE id=?", (now_iso(), job_id))
@@ -73,7 +72,7 @@ def start_workers(count=1):
             time.sleep(1)
     except KeyboardInterrupt:
         stop_event.set()
-        print("Worker(s) stopped.")
+        print("Worker stopped.")
 
 if __name__ == "__main__":
     print("Worker manager started...")
